@@ -12,3 +12,8 @@ echo "branch : $branch"
 remote=$(git remote get-url origin)
 echo "Remote URL : $remote"
 echo "-------------------------------------------"
+
+Commits=$(git rev-list --count HEAD)
+echo "Total-commits : $Commits"
+details=$(git log --pretty=format:"%h - %an, %ar:%s")
+echo "Commit-Details : $details"
