@@ -15,5 +15,14 @@ echo "-------------------------------------------"
 
 Commits=$(git rev-list --count HEAD)
 echo "Total-commits : $Commits"
-details=$(git log --pretty=format:"%h - %an, %ar:%s")
-echo "Commit-Details : $details"
+branches=$(git branch | wc -l)
+echo "total-Branches : $branches"
+contri=$(git shortlog -sn | wc -l)
+echo "Contributions : $contri"
+echo "-----------Commit Details-------------------"
+name=$(git log --pretty="%an" | sort | uniq)
+echo "Author name : $name"
+last_date=$(git log -1 --pretty=format:"%cd" --date=short)
+echo "Last Commit Date : $last_date"
+last_time=$(git log -1 --pretty=format:"%cd" --date=format-local:"%I:%M:%S %p")
+echo "Last commit Timing: $last_time"
