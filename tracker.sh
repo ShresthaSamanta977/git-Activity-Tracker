@@ -42,3 +42,4 @@ if git status --porcelain | grep -q .; then
 else
     echo -e "${GREEN} Repository Status : Working tree clean${NC}"
 fi 
+
