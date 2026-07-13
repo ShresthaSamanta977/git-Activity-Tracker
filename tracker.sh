@@ -66,4 +66,7 @@ else
     echo "Poor commit messages:"
     echo -e "$poor_list"
 fi
+echo "-----------------------All-Commit-Dates-----------------------------"
+all_dates=$(git log --pretty=format:"%ad | %s" --date=short)
+echo "All Commit Dates: $all_dates"
 
