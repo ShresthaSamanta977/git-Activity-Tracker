@@ -1,4 +1,7 @@
 #!/bin/bash
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
 
 echo "========================================="
 echo "      git Activity Tracker"
@@ -34,4 +37,8 @@ echo "Repository size: $repo_size"
 git_size=$(du -sh .git | cut -f1)
 echo "git Repository size: $git_size"
 echo "------------------CHECKING-PART-----------------------------"
-
+if git status --porcelain | grep -q .; then
+    echo -e "${RED} Repository Status : Uncommitted changes found${NC}"
+else
+    echo -e "${GREEN} Repository Status : Working tree clean${NC}"
+fi 
