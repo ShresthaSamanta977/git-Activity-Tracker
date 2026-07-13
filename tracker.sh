@@ -14,7 +14,7 @@ branch=$(git branch --show-current)
 echo "branch : $branch"
 remote=$(git remote get-url origin)
 echo "Remote URL : $remote"
-echo "-------------------------------------------"
+echo "-------------------------------------------------------------------------------"
 
 Commits=$(git rev-list --count HEAD)
 echo "Total-commits : $Commits"
@@ -22,27 +22,27 @@ branches=$(git branch | wc -l)
 echo "total-Branches : $branches"
 contri=$(git shortlog -sn | wc -l)
 echo "Contributions : $contri"
-echo "-----------Commit Details-------------------"
+echo "-----------Commit Details--------------------------------------------------------"
 name=$(git log --pretty="%an" | sort | uniq)
 echo "Author name : $name"
 last_date=$(git log -1 --pretty=format:"%cd" --date=short)
 echo "Last Commit Date : $last_date"
 last_time=$(git log -1 --pretty=format:"%cd" --date=format-local:"%I:%M:%S %p")
 echo "Last commit Timing: $last_time"
-echo "------------Repository Helth-----------------"
+echo "------------Repository Helth----------------------------------------------------"
 tracked_files=$(git ls-files | wc -l)
 echo "Tracked files: $tracked_files"
 repo_size=$(du -sh . | cut -f1)
 echo "Repository size: $repo_size"
 git_size=$(du -sh .git | cut -f1)
 echo "git Repository size: $git_size"
-echo "------------------CHECKING-PART-----------------------------"
+echo "------------------CHECKING-PART----------------------------------------------------"
 if git status --porcelain | grep -q .; then
     echo -e "${RED} Repository Status : Uncommitted changes found${NC}"
 else
     echo -e "${GREEN} Repository Status : Working tree clean${NC}"
 fi 
-echo "-----------------------REPO-QUALITY--------------------------"
+echo "-----------------------REPO-QUALITY-------------------------------------------------"
 
 bad_messages="test update abc temp hello fix demo sample"
 count=0
@@ -66,7 +66,74 @@ else
     echo "Poor commit messages:"
     echo -e "$poor_list"
 fi
-echo "-----------------------All-Commit-Dates-----------------------------"
+echo "-----------------------All-Commit-Dates------------------------------------------------"
 all_dates=$(git log --pretty=format:"%ad | %s" --date=short)
 echo "All Commit Dates: $all_dates"
+echo "-------------------------COMMIT-ACTIVITY-----------------------------------------------"
+declare -A graph
+
+while read date
+do
+    day=$(date -d "$date" +"%a")
+    week=$(date -d "$date" +"%V")
+
+    key="$week-$day"
+
+    graph["$key"]=$(( ${graph["$key"]:-0} + 1 ))
+
+done < <(git log --date=short --pretty=format:"%ad")
+
+echo "Stored Commit Counts"
+echo "--------------------"
+
+for key in "${!graph[@]}"
+do
+    echo "$key = ${graph[$key]}"
+done
+echo
+echo "Contribution Graph"
+echo "------------------"
+
+days=("Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun")
+current_week=$(date +"%V")
+
+weeks=()
+
+for ((i=3; i>=0; i--))
+do
+    weeks+=($(printf "%02d" $((10#$current_week-i))))
+done
+
+printf "      "
+
+for week in "${weeks[@]}"
+do
+    printf "W%-3s" "$week"
+done
+
+echo
+
+for day in "${days[@]}"
+do
+    printf "%-5s " "$day"
+
+    for week in "${weeks[@]}"
+    do
+        key="$week-$day"
+        count=${graph[$key]:-0}
+
+        if [ "$count" -eq 0 ]; then
+            printf "🟥  "
+        elif [ "$count" -eq 1 ]; then
+            printf "⬜  "
+        else
+            printf "🟩  "
+        fi
+    done
+
+    echo
+done
+echo "🟥 No commits"
+echo "⬜ One commit"
+echo "🟩 Multiple commits"
 
