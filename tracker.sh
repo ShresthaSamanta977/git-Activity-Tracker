@@ -42,4 +42,28 @@ if git status --porcelain | grep -q .; then
 else
     echo -e "${GREEN} Repository Status : Working tree clean${NC}"
 fi 
+echo "-----------------------REPO-QUALITY--------------------------"
+
+bad_messages="test update abc temp hello fix demo sample"
+count=0
+poor_list=""
+while read -r msg
+do
+    lower=$(echo "$msg" | tr '[:upper:]' '[:lower:]')
+
+    if echo "$bad_messages" | grep -wq "$lower"
+    then
+        count=$((count + 1))
+        poor_list="$poor_list\n- $msg"
+    fi
+done < <(git log --pretty=format:"%s")
+if [ "$count" -eq 0 ]
+then
+    echo -e "${GREEN}✔ All commit messages are meaningful${NC}"
+else
+    echo -e "${RED}✘ $count commit(s) have non-descriptive messages${NC}"
+    echo
+    echo "Poor commit messages:"
+    echo -e "$poor_list"
+fi
 
